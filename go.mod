@@ -17,7 +17,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/runc v1.0.0-rc93
 	github.com/opencontainers/runtime-spec v1.0.3-0.20200929063507-e6143ca7d51d
-	github.com/opencontainers/selinux v1.8.0
+	github.com/opencontainers/selinux v1.8.2
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/ffjson v0.0.0-20181028064349-e517b90714f7
 	github.com/sirupsen/logrus v1.8.1
