@@ -182,12 +182,34 @@ func (e *fastEncL5) Encode(dst *tokens, src []byte) {
 		// match. But, prior to the match, src[nextEmit:s] are unmatched. Emit
 		// them as literal bytes.
 
-		// Extend the 4-byte match as long as possible.
 		if l == 0 {
+			// Extend the 4-byte match as long as possible.
 			l = e.matchlenLong(s+4, t+4, src) + 4
 		} else if l == maxMatchLength {
 			l += e.matchlenLong(s+l, t+l, src)
 		}
+
+		// Try to locate a better match by checking the end of best match...
+		if sAt := s + l; l < 30 && sAt < sLimit {
+			// Allow some bytes at the beginning to mismatch.
+			// Sweet spot is 2/3 bytes depending on input.
+			// 3 is only a little better when it is but sometimes a lot worse.
+			// The skipped bytes are tested in Extend backwards,
+			// and still picked up as part of the match if they do.
+			const skipBeginning = 2
+			eLong := e.bTable[hash7(load6432(src, sAt), tableBits)].Cur.offset
+			t2 := eLong - e.cur - l + skipBeginning
+			s2 := s + skipBeginning
+			off := s2 - t2
+			if t2 >= 0 && off < maxMatchOffset && off > 0 {
+				if l2 := e.matchlenLong(s2, t2, src); l2 > l {
+					t = t2
+					l = l2
+					s = s2
+				}
+			}
+		}
+
 		// Extend backwards
 		for t > 0 && s > nextEmit && src[t-1] == src[s-1] {
 			s--
@@ -195,7 +217,15 @@ func (e *fastEncL5) Encode(dst *tokens, src []byte) {
 			l++
 		}
 		if nextEmit < s {
-			emitLiteral(dst, src[nextEmit:s])
+			if false {
+				emitLiteral(dst, src[nextEmit:s])
+			} else {
+				for _, v := range src[nextEmit:s] {
+					dst.tokens[dst.n] = token(v)
+					dst.litHist[v]++
+					dst.n++
+				}
+			}
 		}
 		if debugDeflate {
 			if t >= s {
