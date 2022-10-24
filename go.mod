@@ -3,7 +3,7 @@ go 1.14
 module github.com/containers/storage
 
 require (
-	github.com/BurntSushi/toml v0.3.1
+	github.com/BurntSushi/toml v1.2.1
 	github.com/Microsoft/go-winio v0.4.17-0.20210211115548-6eac466e5fa3
 	github.com/Microsoft/hcsshim v0.8.16
 	github.com/docker/go-units v0.4.0
